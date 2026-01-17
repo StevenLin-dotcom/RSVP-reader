@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RSVP Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h3>RSVP Reader</h3>
+  <div id="display">Ready</div>
+  <textarea id="textInput" rows="4">This is a simple RSVP demo.</textarea>
+  <button id="startBtn">Start</button>
+  <button id="pauseBtn">Pause</button>
+  <button id="replayBtn">Replay</button>
+
+  <label>
+    Speed (ms):
+    <input type="range" id="speedSlider" min="200" max="800" value="400" step="50">
+    <span id="speedValue">400</span>
+  </label>
+
+
+  <script src="popup.js"></script>
+</body>
+</html>
