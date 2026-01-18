@@ -1,5 +1,3 @@
-console.log("Controls loaded");
-
 /* ======================
    RSVP Renderer Initialization
 ====================== */
@@ -11,100 +9,26 @@ const renderer = new RSVPRenderer(displayContainer, {
 });
 
 /* ======================
-   Player State
+   Playback Engine (using unified engine)
 ====================== */
 
-let playerState = "idle";
-// possible: idle | playing | paused | finished
+// Convert ms to WPM for the engine (400ms = 150 WPM)
+function msToWpm(ms) {
+  return 60000 / ms;
+}
 
-/* ======================
-   Playback Engine
-====================== */
+function wpmToMs(wpm) {
+  return 60000 / wpm;
+}
 
-const engine = {
-  words: [],
-  currentIndex: 0,
-  intervalId: null,
-  speed: 400,
-
-  loadText(words) {
-    this.words = words;
-    this.currentIndex = 0;
-    console.log("ENGINE → text loaded:", words);
-    if (words.length > 0) {
-      renderer.clear();
-    }
-  },
-
-  setSpeed(ms) {
-    this.speed = ms;
-    console.log("ENGINE → speed set to", ms);
-    
-    // If currently playing, restart the interval with new speed
-    if (playerState === "playing" && this.intervalId !== null) {
-      this._stopInterval();
-      this._startInterval();
-    }
-  },
-
-  start() {
-    if (this.words.length === 0) {
-      console.log("ENGINE → no text loaded");
-      return;
-    }
-
-    // If already at the end, don't start
-    if (this.currentIndex >= this.words.length) {
-      console.log("ENGINE → already finished");
-      return;
-    }
-
-    console.log("ENGINE → start from index", this.currentIndex);
-    this._startInterval();
-  },
-
-  pause() {
-    console.log("ENGINE → pause at index", this.currentIndex);
-    this._stopInterval();
-  },
-
-  reset() {
-    console.log("ENGINE → reset");
-    this._stopInterval();
-    this.currentIndex = 0;
-    renderer.clear();
-  },
-
-  _startInterval() {
-    // Clear any existing interval
-    this._stopInterval();
-
-    // Show current word immediately
-    if (this.currentIndex < this.words.length) {
-      renderer.render(this.words[this.currentIndex]);
-    }
-
-    // Set up interval for next words
-    this.intervalId = setInterval(() => {
-      this.currentIndex++;
-      
-      if (this.currentIndex >= this.words.length) {
-        // Playback finished
-        this._stopInterval();
-        setState("finished");
-      } else {
-        renderer.render(this.words[this.currentIndex]);
-      }
-    }, this.speed);
-  },
-
-  _stopInterval() {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+// Create engine with state change callback
+const engine = new RSVPPlaybackEngine(renderer, {
+  speed: msToWpm(400), // Convert initial 400ms to WPM
+  onStateChange: (state) => {
+    playerState = state;
+    setState(state);
   }
-};
+});
 
 /* ======================
    DOM Elements
@@ -123,13 +47,10 @@ const textInput = document.getElementById("textInput");
    Helpers
 ====================== */
 
-function parseText(text) {
-  return text.trim().split(/\s+/);
-}
+let playerState = "idle";
 
 function setState(newState) {
   playerState = newState;
-  console.log("STATE →", playerState);
   
   // Update button states based on player state
   if (newState === "playing") {
@@ -173,9 +94,10 @@ replayBtn.onclick = () => {
 ====================== */
 
 speedSlider.addEventListener("input", () => {
-    const ms = Number(speedSlider.value); // 获取当前滑块值
+    const ms = Number(speedSlider.value); // 获取当前滑块值（毫秒）
     speedValue.textContent = ms;          // 更新显示
-    engine.setSpeed(ms);                   // 通知 engine
+    const wpm = msToWpm(ms);              // 转换为 WPM
+    engine.setSpeed(wpm);                  // 通知 engine
   });
 
 
@@ -184,14 +106,14 @@ speedSlider.addEventListener("input", () => {
 ====================== */
 
 textInput.onchange = () => {
-  const words = parseText(textInput.value);
+  const text = textInput.value;
+  engine.loadText(text);
   engine.reset();
-  engine.loadText(words);
-  setState("idle");
 };
 
 // Initialize with default text and speed
-const initialWords = parseText(textInput.value);
-engine.loadText(initialWords);
-engine.setSpeed(Number(speedSlider.value));
+const initialText = textInput.value;
+engine.loadText(initialText);
+const initialMs = Number(speedSlider.value);
+engine.setSpeed(msToWpm(initialMs));
 setState("idle");

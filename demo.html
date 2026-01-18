@@ -218,6 +218,8 @@
   </div>
 
   <script src="src/renderer.js"></script>
+  <script src="src/utils.js"></script>
+  <script src="src/playback-engine.js"></script>
   <script>
     // Initialize the renderer
     const container = document.getElementById('rsvp-display');
@@ -225,6 +227,9 @@
       highlightColor: '#ff6b6b',
       fontSize: '48px'
     });
+
+    // Word info element
+    const wordInfoEl = document.getElementById('word-info');
 
     // Word input handling
     const wordInput = document.getElementById('word-input');
@@ -236,16 +241,8 @@
       const word = wordInput.value.trim();
       if (word) {
         renderer.render(word);
-        updateWordInfo(word);
+        updateWordInfo(word, renderer, wordInfoEl);
       }
-    }
-
-    function updateWordInfo(word) {
-      const parts = renderer._splitWord(word);
-      const orpIndex = renderer._getORPIndex(word.replace(/^["""'''`([{<¿¡]+/, ''));
-      document.getElementById('word-info').innerHTML =
-        `Word: "${word}" | Length: ${word.length} | ORP Index: ${orpIndex} | ` +
-        `Parts: ["${parts.before}"] [<span style="color:#ff6b6b">${parts.orp}</span>] ["${parts.after}"]`;
     }
 
     // Generate test word buttons
@@ -262,7 +259,7 @@
       btn.textContent = `${word} (${word.length})`;
       btn.onclick = () => {
         renderer.render(word);
-        updateWordInfo(word);
+        updateWordInfo(word, renderer, wordInfoEl);
         wordInput.value = word;
       };
       testWordsContainer.appendChild(btn);
@@ -278,56 +275,42 @@
       btn.textContent = word;
       btn.onclick = () => {
         renderer.render(word);
-        updateWordInfo(word);
+        updateWordInfo(word, renderer, wordInfoEl);
         wordInput.value = word;
       };
       punctContainer.appendChild(btn);
     });
 
-    // Sentence playback
-    let playbackInterval = null;
+    // Sentence playback engine
+    const playbackEngine = new RSVPPlaybackEngine(renderer, {
+      speed: 300,
+      onWordUpdate: (word) => {
+        updateWordInfo(word, renderer, wordInfoEl);
+      }
+    });
 
     const wpmSlider = document.getElementById('wpm-slider');
     const wpmValue = document.getElementById('wpm-value');
     wpmSlider.addEventListener('input', () => {
-      wpmValue.textContent = `${wpmSlider.value} WPM`;
+      const wpm = parseInt(wpmSlider.value);
+      wpmValue.textContent = `${wpm} WPM`;
+      playbackEngine.setSpeed(wpm);
     });
 
     function playSentence() {
-      stopPlayback();
       const sentence = document.getElementById('sentence-input').value;
-      const words = sentence.split(/\s+/).filter(w => w.length > 0);
-
-      if (words.length === 0) return;
-
-      const wpm = parseInt(wpmSlider.value);
-      const msPerWord = 60000 / wpm;
-      let index = 0;
-
-      function showNext() {
-        if (index < words.length) {
-          renderer.render(words[index]);
-          updateWordInfo(words[index]);
-          index++;
-        } else {
-          stopPlayback();
-        }
-      }
-
-      showNext();
-      playbackInterval = setInterval(showNext, msPerWord);
+      playbackEngine.loadText(sentence);
+      playbackEngine.start();
     }
 
     function stopPlayback() {
-      if (playbackInterval) {
-        clearInterval(playbackInterval);
-        playbackInterval = null;
-      }
+      playbackEngine.pause();
+      playbackEngine.reset();
     }
 
     // Show initial word
     renderer.render('Hello');
-    updateWordInfo('Hello');
+    updateWordInfo('Hello', renderer, wordInfoEl);
   </script>
 </body>
 </html>
