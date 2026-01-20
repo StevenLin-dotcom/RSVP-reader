@@ -8,49 +8,67 @@
   <link rel="stylesheet" href="renderer.css" />
 </head>
 <body>
+
   <div class="container">
-    <h3>RSVP Reader</h3>
-    
-    <div class="display-section">
+    <h2>RSVP Reader</h2>
+
+    <div class="section">
+      <span class="section-title">Display</span>
       <div id="rsvp-display" class="show-guide"></div>
-      <div id="word-info" class="word-info"></div>
     </div>
 
-    <div class="input-section">
-      <label for="textInput">Text Input</label>
-      <textarea id="textInput" rows="4" placeholder="Enter text here or upload a .txt file...">The quick brown fox jumps over the lazy dog.</textarea>
+    <div class="section">
+      <div class="input-group">
+        <label for="textInput" class="section-title">Text Input</label>
+        <textarea id="textInput" rows="4" placeholder="Enter or paste your text here...">The quick brown fox jumps over the lazy dog.</textarea>
+      </div>
     </div>
 
-    <div class="file-section">
-      <label for="fileInput">Upload TXT File</label>
-      <input type="file" id="fileInput" accept=".txt,text/*">
+    <div class="section">
+      <div class="input-group">
+        <label for="fileInput" class="section-title">Upload TXT File</label>
+        <input type="file" id="fileInput" accept=".txt,text/*">
+      </div>
     </div>
 
-    <div class="speed-section">
-      <label>
-        Speed (WPM):
-        <div class="speed-control">
-          <input type="range" id="speedSlider" min="100" max="900" step="50" value="300">
-          <span id="speedValue">300</span> WPM
+    <div class="section">
+      <div class="speed-control">
+        <label for="speedSlider">Speed</label>
+        <input
+          type="range"
+          id="speedSlider"
+          min="100"
+          max="900"
+          step="50"
+          value="300"
+        />
+        <div class="speed-value">
+          <span id="speedValue">300</span> <span class="speed-unit">WPM</span>
         </div>
-      </label>
+      </div>
     </div>
 
-    <div class="controls-section">
-      <button id="startBtn">Start</button>
-      <button id="pauseBtn" class="secondary">Pause</button>
-      <button id="replayBtn" class="secondary">Replay</button>
+    <div class="section">
+      <div class="button-group">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="replayBtn">Replay</button>
+      </div>
     </div>
 
-    <div class="status-section">
-      <span class="status-label">Status:</span>
-      <span id="statusText">idle</span>
-    </div>
   </div>
 
   <script src="renderer.js"></script>
-  <script src="playback-engine.js"></script>
   <script src="utils.js"></script>
-  <script src="popup.js"></script>
+  <script src="playback-engine.js"></script>
+  <script src="controller.js"></script>
+  <script>
+    initRSVPController({
+      fontSize: '36px',
+      disableStartOnPlay: true,
+      throttleSpeed: true,
+      defaultText: 'The quick brown fox jumps over the lazy dog.'
+    });
+  </script>
 </body>
 </html>

@@ -4,254 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RSVP Controls Demo</title>
+  <link rel="stylesheet" href="src/styles.css">
   <link rel="stylesheet" href="src/renderer.css">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      padding: 20px;
-      max-width: 700px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-
-    h2 {
-      margin: 0 0 30px 0;
-      color: #333;
-      font-size: 28px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    .section {
-      margin-bottom: 30px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    #rsvp-display {
-      height: 80px;
-      display: flex;
-      align-items: center;
-      background: #1a1a2e;
-      color: #eee;
-      border-radius: 8px;
-      font-size: 48px;
-      margin-bottom: 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #333;
-      font-size: 14px;
-    }
-
-    textarea {
-      width: 100%;
-      font-size: 14px;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-family: inherit;
-      resize: vertical;
-      transition: all 0.3s ease;
-      line-height: 1.5;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .speed-control {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-
-    .speed-control label {
-      margin: 0;
-      min-width: 90px;
-      font-size: 14px;
-      color: #555;
-    }
-
-    input[type="range"] {
-      flex: 1;
-      height: 6px;
-      border-radius: 3px;
-      background: #e0e0e0;
-      outline: none;
-      -webkit-appearance: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #667eea;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-    }
-
-    input[type="range"]::-webkit-slider-thumb:hover {
-      background: #5568d3;
-      transform: scale(1.1);
-    }
-
-    input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #667eea;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-    }
-
-    input[type="range"]::-moz-range-thumb:hover {
-      background: #5568d3;
-      transform: scale(1.1);
-    }
-
-    .speed-value {
-      min-width: 60px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 600;
-      color: #667eea;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .button-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      flex: 1;
-      min-width: 100px;
-      padding: 12px 24px;
-      font-size: 15px;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    #startBtn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    #startBtn:hover {
-      background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
-    }
-
-    #pauseBtn {
-      background: #ffa726;
-      color: white;
-    }
-
-    #pauseBtn:hover:not(:disabled) {
-      background: #ff9800;
-    }
-
-    #pauseBtn:disabled {
-      background: #e0e0e0;
-      color: #999;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    #replayBtn {
-      background: #26a69a;
-      color: white;
-    }
-
-    #replayBtn:hover {
-      background: #00897b;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-
-      .container {
-        padding: 20px;
-      }
-
-      .speed-control {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .speed-control label {
-        min-width: auto;
-      }
-
-      .button-group {
-        flex-direction: column;
-      }
-
-      button {
-        width: 100%;
-      }
-    }
-  </style>
 </head>
 <body>
 
@@ -271,27 +25,34 @@
     </div>
 
     <div class="section">
+      <div class="input-group">
+        <label for="fileInput" class="section-title">Upload TXT File</label>
+        <input type="file" id="fileInput" accept=".txt,text/*">
+      </div>
+    </div>
+
+    <div class="section">
       <div class="speed-control">
         <label for="speedSlider">Speed</label>
         <input
           type="range"
           id="speedSlider"
-          min="200"
-          max="800"
+          min="100"
+          max="900"
           step="50"
-          value="400"
+          value="300"
         />
         <div class="speed-value">
-          <span id="speedValue">400</span> <span style="font-size: 12px; color: #999;">ms</span>
+          <span id="speedValue">300</span> <span class="speed-unit">WPM</span>
         </div>
       </div>
     </div>
 
     <div class="section">
       <div class="button-group">
-        <button id="startBtn">▶ Start</button>
-        <button id="pauseBtn" disabled>⏸ Pause</button>
-        <button id="replayBtn">↻ Replay</button>
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="replayBtn">Replay</button>
       </div>
     </div>
 
@@ -300,6 +61,11 @@
   <script src="src/renderer.js"></script>
   <script src="src/utils.js"></script>
   <script src="src/playback-engine.js"></script>
-  <script src="controls.js"></script>
+  <script src="src/controller.js"></script>
+  <script>
+    initRSVPController({
+      fontSize: '48px'
+    });
+  </script>
 </body>
 </html>

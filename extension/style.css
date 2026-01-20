@@ -1,184 +1,71 @@
-* {
-  box-sizing: border-box;
+/**
+ * RSVP Reader Extension - Style Overrides
+ * Compact sizing for browser extension popup
+ * Base styles are in styles.css (copied from src/styles.css during build)
+ */
+
+@import url('styles.css');
+
+:root {
+  --body-padding: 12px;
+  --body-width: 380px;
+  --body-min-height: 100%;
+
+  --container-padding: 20px;
+  --container-border-radius: 12px;
+  --container-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+
+  --h2-margin-bottom: 20px;
+  --h2-font-size: 20px;
+
+  --section-margin-bottom: 16px;
+  --section-title-font-size: 11px;
+  --section-title-margin-bottom: 8px;
+
+  --display-height: 60px;
+  --display-font-size: 32px;
+  --display-border-radius: 6px;
+
+  --input-group-margin-bottom: 0;
+  --label-margin-bottom: 6px;
+  --label-font-size: 12px;
+
+  --textarea-font-size: 13px;
+  --textarea-padding: 10px;
+  --textarea-border-radius: 6px;
+  --textarea-line-height: 1.4;
+  --textarea-min-height: 70px;
+
+  --file-font-size: 12px;
+  --file-padding: 10px;
+  --file-border-radius: 6px;
+
+  --speed-control-gap: 10px;
+  --speed-control-padding: 12px;
+  --speed-control-border-radius: 6px;
+  --speed-control-label-min-width: 45px;
+  --speed-control-label-font-size: 12px;
+
+  --range-height: 5px;
+  --slider-thumb-size: 16px;
+
+  --speed-value-min-width: 55px;
+  --speed-value-font-size: 14px;
+  --speed-value-padding: 6px 8px;
+  --speed-value-border-radius: 4px;
+  --speed-unit-font-size: 10px;
+
+  --button-padding: 10px 16px;
+  --button-font-size: 13px;
+  --button-border-radius: 6px;
+  --button-min-width: auto;
+  --button-group-gap: 8px;
+  --button-hover-transform: translateY(-1px);
+  --button-letter-spacing: 0.3px;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  width: 400px;
-  max-height: 800px;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
-  overflow-y: auto;
-}
-
-.container {
-  padding: 15px;
-}
-
-h3 {
-  margin: 0 0 15px 0;
-  text-align: center;
-  color: #333;
-  font-size: 18px;
-}
-
-/* Display Section */
-.display-section {
-  background: white;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#rsvp-display {
-  height: 60px;
-  display: flex;
-  align-items: center;
-  background: #1a1a2e;
-  color: #eee;
-  border-radius: 4px;
-  font-size: 36px;
-  margin-bottom: 10px;
-}
-
-.word-info {
-  font-family: monospace;
-  font-size: 10px;
-  background: #f9f9f9;
-  padding: 8px;
-  border-radius: 4px;
-  color: #666;
-  line-height: 1.4;
-  margin-top: 8px;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Input Section */
-.input-section,
-.file-section,
-.speed-section {
-  background: white;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.input-section label,
-.file-section label,
-.speed-section label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-  font-size: 13px;
-}
-
-textarea {
-  width: 100%;
-  font-size: 13px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 60px;
-}
-
-input[type="file"] {
-  width: 100%;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.speed-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-input[type="range"] {
-  flex: 1;
-  min-width: 0;
-}
-
-#speedValue {
-  min-width: 45px;
-  font-weight: bold;
-  color: #0066cc;
-  font-size: 13px;
-}
-
-/* Controls Section */
-.controls-section {
-  background: white;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-button {
-  flex: 1;
-  min-width: 80px;
-  padding: 10px 15px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #0066cc;
-  color: white;
-  transition: background 0.2s;
-}
-
-button:hover:not(:disabled) {
-  background: #0052a3;
-}
-
-button:disabled {
-  background: #ccc !important;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-button.secondary {
-  background: #666;
-}
-
-button.secondary:hover:not(:disabled) {
-  background: #555;
-}
-
-/* Status Section */
-.status-section {
-  background: white;
-  border-radius: 8px;
-  padding: 12px 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-}
-
-.status-label {
-  font-weight: 600;
-  color: #333;
-  margin-right: 5px;
-}
-
-#statusText {
-  font-weight: 500;
-}
-
-/* Extension-specific RSVP overrides */
+/* Extension-specific RSVP renderer overrides */
 .rsvp-container {
-  max-width: none;  /* Remove the 800px limit from base renderer.css */
-  font-size: 36px !important;
+  max-width: none;
+  font-size: 32px !important;
 }

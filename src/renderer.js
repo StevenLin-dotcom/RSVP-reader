@@ -7,7 +7,7 @@
  */
 
 const FUNCTION_WORDS = new Set([
-  'a', 'an', 'the',
+  'an', 'the',
   'and', 'but', 'or', 'nor', 'for', 'yet', 'so',
   'to', 'of', 'in', 'on', 'at', 'by', 'up',
   'i', 'he', 'we', 'it',
