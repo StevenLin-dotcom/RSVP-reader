@@ -2,8 +2,8 @@
  * RSVP Playback Engine
  * Unified playback engine for RSVP reader
  * 
- * SOURCE OF TRUTH: This is the master file.
- * extension/playback-engine.js should be kept in sync with this file.
+ * NOTE: This file should be kept in sync with src/playback-engine.js
+ * The extension directory requires its own copy due to browser extension limitations.
  */
 
 class RSVPPlaybackEngine {

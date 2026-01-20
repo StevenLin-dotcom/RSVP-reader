@@ -1,3 +1,8 @@
+/**
+ * RSVP Reader Extension - Popup Controller
+ * Uses unified playback engine and utilities
+ */
+
 // ======================
 // Initialize Renderer
 // ======================
@@ -9,130 +14,26 @@ const renderer = new RSVPRenderer(container, {
 });
 
 // ======================
-// Word Info Display
-// ======================
-
-function updateWordInfo(word) {
-  const wordInfoEl = document.getElementById('word-info');
-  if (!wordInfoEl) return;
-
-  const parts = renderer._splitWord(word);
-  const orpIndex = renderer._getORPIndex(word.replace(/^["""'''`([{<¿¡]+/, ''));
-  
-  wordInfoEl.innerHTML = 
-    `Word: "${word}" | Length: ${word.length} | ORP Index: ${orpIndex}<br>` +
-    `Parts: ["${parts.before}"] [<span style="color:#ff6b6b">${parts.orp}</span>] ["${parts.after}"]`;
-}
-
-// ======================
-// Playback Engine
+// Initialize Playback Engine
 // ======================
 
 let playerState = "idle";
-let playbackInterval = null;
-let currentWords = [];
-let currentIndex = 0;
-let currentSpeed = 300; // WPM (Words Per Minute)
 
-// Convert WPM to milliseconds per word
-function wpmToMs(wpm) {
-  return 60000 / wpm;
-}
-
-// Helper function to show next word
-function showNextWord() {
-  if (currentIndex < currentWords.length) {
-    const word = currentWords[currentIndex];
-    renderer.render(word);
-    updateWordInfo(word);
-    currentIndex++;
-  } else {
-    // Finished
-    engine.pause();
-    setState("finished");
+const engine = new RSVPPlaybackEngine(renderer, {
+  speed: 300, // Initial WPM
+  onStateChange: (state) => {
+    playerState = state;
+    updateButtonStates();
+    updateStatusDisplay();
+  },
+  onWordUpdate: (word) => {
+    updateWordInfo(word, renderer, document.getElementById('word-info'));
   }
-}
-
-// Helper function to create playback interval
-function createPlaybackInterval() {
-  return setInterval(showNextWord, wpmToMs(currentSpeed));
-}
-
-const engine = {
-  start() {
-    if (currentWords.length === 0) {
-      return;
-    }
-    
-    // If paused, resume from current index
-    // If idle/finished, start from beginning
-    if (playerState !== "paused") {
-      currentIndex = 0;
-    }
-
-    // Show first word immediately
-    showNextWord();
-    
-    // Set up interval for remaining words
-    playbackInterval = createPlaybackInterval();
-  },
-
-  pause() {
-    if (playbackInterval) {
-      clearInterval(playbackInterval);
-      playbackInterval = null;
-    }
-  },
-
-  reset() {
-    engine.pause();
-    currentIndex = 0;
-    if (currentWords.length > 0) {
-      renderer.render(currentWords[0]);
-      updateWordInfo(currentWords[0]);
-    } else {
-      renderer.clear();
-      const wordInfoEl = document.getElementById('word-info');
-      if (wordInfoEl) wordInfoEl.innerHTML = '';
-    }
-  },
-
-  setSpeed(wpm) {
-    currentSpeed = wpm;
-    // If currently playing, update the interval with new speed
-    if (playerState === "playing" && playbackInterval) {
-      // Clear the old interval
-      clearInterval(playbackInterval);
-      playbackInterval = null;
-      
-      // Create new interval with new speed, continuing from current position
-      playbackInterval = createPlaybackInterval();
-    }
-  },
-
-  loadText(words) {
-    currentWords = words;
-    currentIndex = 0;
-    if (words.length > 0) {
-      renderer.render(words[0]);
-      updateWordInfo(words[0]);
-    } else {
-      renderer.clear();
-      const wordInfoEl = document.getElementById('word-info');
-      if (wordInfoEl) wordInfoEl.innerHTML = '';
-    }
-  }
-};
+});
 
 // ======================
 // State Management
 // ======================
-
-function setState(newState) {
-  playerState = newState;
-  updateButtonStates();
-  updateStatusDisplay();
-}
 
 function updateStatusDisplay() {
   const statusText = document.getElementById('statusText');
@@ -162,14 +63,6 @@ function resetPlayback() {
     engine.pause();
   }
   engine.reset();
-  setState("idle");
-}
-
-function parseText(text) {
-  if (!text || text.trim().length === 0) {
-    return [];
-  }
-  return text.trim().split(/\s+/).filter(word => word.length > 0);
 }
 
 // ======================
@@ -185,8 +78,11 @@ if (startBtn) {
     if (playerState === "playing") {
       return;
     }
+    // If finished, reset first
+    if (playerState === "finished") {
+      engine.reset();
+    }
     engine.start();
-    setState("playing");
   };
 }
 
@@ -196,7 +92,6 @@ if (pauseBtn) {
       return;
     }
     engine.pause();
-    setState("paused");
   };
 }
 
@@ -204,7 +99,6 @@ if (replayBtn) {
   replayBtn.onclick = () => {
     engine.reset();
     engine.start();
-    setState("playing");
   };
 }
 
@@ -219,7 +113,7 @@ if (speedSlider && speedValue) {
   // Initialize display
   const initialWpm = Number(speedSlider.value);
   speedValue.textContent = initialWpm;
-  currentSpeed = initialWpm;
+  engine.setSpeed(initialWpm);
 
   // Throttle speed updates to avoid too frequent interval recreation
   let speedUpdateTimeout = null;
@@ -247,10 +141,10 @@ if (speedSlider && speedValue) {
 const textInput = document.getElementById('textInput');
 if (textInput) {
   textInput.addEventListener('input', () => {
-    const words = parseText(textInput.value);
+    const text = textInput.value;
     resetPlayback();
-    if (words.length > 0) {
-      engine.loadText(words);
+    if (text.trim().length > 0) {
+      engine.loadText(text);
     }
   });
 }
@@ -285,9 +179,8 @@ if (fileInput) {
         textInput.value = fileContent;
       }
       
-      const words = parseText(fileContent);
-      if (words.length > 0) {
-        engine.loadText(words);
+      if (fileContent.trim().length > 0) {
+        engine.loadText(fileContent);
       }
     };
 
@@ -310,8 +203,7 @@ updateStatusDisplay();
 // Load initial text
 if (textInput) {
   const initialText = textInput.value || "The quick brown fox jumps over the lazy dog.";
-  const initialWords = parseText(initialText);
-  if (initialWords.length > 0) {
-    engine.loadText(initialWords);
+  if (initialText.trim().length > 0) {
+    engine.loadText(initialText);
   }
 }

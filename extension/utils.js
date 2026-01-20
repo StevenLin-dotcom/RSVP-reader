@@ -2,8 +2,8 @@
  * RSVP Utility Functions
  * Shared utility functions for RSVP reader
  * 
- * SOURCE OF TRUTH: This is the master file.
- * extension/utils.js should be kept in sync with this file.
+ * NOTE: This file should be kept in sync with src/utils.js
+ * The extension directory requires its own copy due to browser extension limitations.
  */
 
 /**
