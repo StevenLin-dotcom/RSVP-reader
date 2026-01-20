@@ -2,8 +2,8 @@
  * RSVPRenderer - Rapid Serial Visual Presentation renderer
  * Displays words with ORP (Optimal Recognition Point) highlighting
  * 
- * SOURCE OF TRUTH: This is the master file.
- * extension/renderer.js should be kept in sync with this file.
+ * NOTE: This file should be kept in sync with src/renderer.js
+ * The extension directory requires its own copy due to browser extension limitations.
  */
 
 const FUNCTION_WORDS = new Set([

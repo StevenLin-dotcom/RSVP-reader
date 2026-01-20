@@ -1,107 +1,133 @@
-console.log("Controls loaded");
+/**
+ * RSVP Reader Controls
+ * Uses unified playback engine and utilities
+ */
 
-/* ======================
-   Player State
-====================== */
+// ======================
+// Initialize Renderer
+// ======================
+
+const displayContainer = document.getElementById("rsvp-display");
+const renderer = new RSVPRenderer(displayContainer, {
+  highlightColor: '#ff6b6b',
+  fontSize: '48px'
+});
+
+// ======================
+// Utility Functions
+// ======================
+
+// Convert milliseconds to WPM (for speed slider that uses ms)
+function msToWpm(ms) {
+  return 60000 / ms;
+}
+
+// ======================
+// Initialize Playback Engine
+// ======================
 
 let playerState = "idle";
-// possible: idle | playing | paused
 
-/* ======================
-   Fake Engine (stub)
-   later replaced by real engine
-====================== */
-
-const engine = {
-  start() {
-    console.log("ENGINE → start");
-  },
-
-  pause() {
-    console.log("ENGINE → pause");
-  },
-
-  reset() {
-    console.log("ENGINE → reset");
-  },
-
-  setSpeed(ms) {
-    console.log("ENGINE → speed set to", ms);
-  },
-
-  loadText(words) {
-    console.log("ENGINE → text loaded:", words);
+const engine = new RSVPPlaybackEngine(renderer, {
+  speed: msToWpm(400), // Convert initial 400ms to WPM
+  onStateChange: (state) => {
+    playerState = state;
+    updateButtonStates();
   }
-};
+});
 
-/* ======================
-   DOM Elements
-====================== */
+// ======================
+// DOM Elements
+// ======================
 
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const replayBtn = document.getElementById("replayBtn");
-
 const speedSlider = document.getElementById("speedSlider");
 const speedValue = document.getElementById("speedValue");
-
 const textInput = document.getElementById("textInput");
 
-/* ======================
-   Helpers
-====================== */
+// ======================
+// State Management
+// ======================
 
-function parseText(text) {
-  return text.trim().split(/\s+/);
+function updateButtonStates() {
+  if (pauseBtn) {
+    pauseBtn.disabled = (playerState !== "playing");
+  }
 }
 
-function setState(newState) {
-  playerState = newState;
-  console.log("STATE →", playerState);
+// ======================
+// Button Controls
+// ======================
+
+if (startBtn) {
+  startBtn.onclick = () => {
+    if (playerState === "playing") return;
+
+    // If finished, reset first
+    if (playerState === "finished") {
+      engine.reset();
+    }
+
+    engine.start();
+  };
 }
 
-/* ======================
-   Button Controls
-====================== */
+if (pauseBtn) {
+  pauseBtn.onclick = () => {
+    if (playerState !== "playing") return;
+    engine.pause();
+  };
+}
 
-startBtn.onclick = () => {
-  if (playerState === "playing") return;
+if (replayBtn) {
+  replayBtn.onclick = () => {
+    engine.reset();
+    engine.start();
+  };
+}
 
-  engine.start();
-  setState("playing");
-};
+// ======================
+// Speed Control
+// ======================
 
-pauseBtn.onclick = () => {
-  if (playerState !== "playing") return;
-
-  engine.pause();
-  setState("paused");
-};
-
-replayBtn.onclick = () => {
-  engine.reset();
-  engine.start();
-  setState("playing");
-};
-
-/* ======================
-   Speed Control
-====================== */
-
-speedSlider.addEventListener("input", () => {
-    const ms = Number(speedSlider.value); // 获取当前滑块值
-    speedValue.textContent = ms;          // 更新显示
-    engine.setSpeed(ms);                   // 通知 engine
+if (speedSlider && speedValue) {
+  speedSlider.addEventListener("input", () => {
+    const ms = Number(speedSlider.value); // Get current slider value (milliseconds)
+    speedValue.textContent = ms;          // Update display
+    const wpm = msToWpm(ms);              // Convert to WPM
+    engine.setSpeed(wpm);                  // Update engine speed
   });
+}
 
+// ======================
+// Text Input Handling
+// ======================
 
-/* ======================
-   Text Input Handling
-====================== */
+if (textInput) {
+  textInput.addEventListener("input", () => {
+    const text = textInput.value;
+    engine.loadText(text);
+    engine.reset();
+  });
+}
 
-textInput.onchange = () => {
-  const words = parseText(textInput.value);
-  engine.reset();
-  engine.loadText(words);
-  setState("idle");
-};
+// ======================
+// Initialize
+// ======================
+
+// Load initial text and speed
+if (textInput) {
+  const initialText = textInput.value;
+  if (initialText.trim().length > 0) {
+    engine.loadText(initialText);
+  }
+}
+
+if (speedSlider) {
+  const initialMs = Number(speedSlider.value);
+  engine.setSpeed(msToWpm(initialMs));
+}
+
+updateButtonStates();
