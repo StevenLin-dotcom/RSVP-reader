@@ -77,14 +77,25 @@ cd RSVP-reader
 
 ### Run the Demo
 
-Open the following file in a modern browser:
+### Option 1: Run via Extension (Recommended)
 
-```
-demo/demo.html
-```
+1. First, execute the build script to generate the extension package:
+   
+   ```bash
+   ./scripts/build-extension.sh
+   
+2. Open Chrome and navigate to the extension management page:
+   chrome://extensions/
+   
+3. Enable Developer mode (toggle in the top-right corner).
+4. Drag the generated ZIP file from the Build folder into the extension page to load it.
+
+### Option 2: Run via HTML File
+Open the following file directly in a modern browser:
+
+```index.html
 
 No build step or server is required.
-
 ---
 
 ## 🔧 Customization
