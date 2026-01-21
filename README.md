@@ -94,7 +94,7 @@ cd RSVP-reader
 
 Open the following file directly in a modern browser:
 
-```index.html
+```index.html```
 
 No build step or server is required.
 ---
